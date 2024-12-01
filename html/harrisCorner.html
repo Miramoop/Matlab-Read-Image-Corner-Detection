@@ -1,0 +1,394 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>harrisCorner</title>
+<meta name="generator" content="MATLAB 24.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2024-12-01">
+<meta name="DC.source" content="harrisCorner.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<pre class="codeinput">
+<span class="comment">% Read the image into Matlab and name it myImage</span>
+myImage = imread(<span class="string">"Penguins.jpg"</span>);
+
+<span class="comment">% Convert the rgb image to grayscale</span>
+myImage = rgb2gray(myImage);
+
+<span class="comment">% Cast the variable to double and reassign it to itself</span>
+myImage = double(myImage);
+
+<span class="comment">% Create X and Y derivative filters</span>
+dxFilter = [-1 0 -1; -1 0 1; -1 0 1];
+dyFilter = dxFilter';
+
+<span class="comment">% Create an X derivative image and a Y derivative image by convolving</span>
+<span class="comment">% the appropriate filters with the grayscale image. Use the following</span>
+<span class="comment">% names for the new images: myImageDerivativeX and myImageDerivativeY</span>
+myImageDerivativeX = conv2(myImage, dxFilter, <span class="string">'same'</span>);
+myImageDerivativeY = conv2(myImage, dyFilter, <span class="string">'same'</span>);
+
+<span class="comment">% Now that we have the derivatives, we can calculate A, B, &amp; C</span>
+A = myImageDerivativeX .^2;
+B = myImageDerivativeY .^2;
+C = myImageDerivativeX .* myImageDerivativeY;
+
+<span class="comment">% After you calculate the above you want to apply Gaussian smoothing (using</span>
+<span class="comment">% a Gausssian Filter) using the conv2 command. Store each of the smoothed</span>
+<span class="comment">% derivatives in smoothdA, smoothedB, &amp; smoothedC. You can use the</span>
+<span class="comment">% following command to create your Gaussian filter:</span>
+gaussianFilter = fspecial(<span class="string">'gaussian'</span>);
+smoothedA = conv2(A, gaussianFilter, <span class="string">'same'</span>);
+smoothedB = conv2(B, gaussianFilter, <span class="string">'same'</span>);
+smoothedC = conv2(C, gaussianFilter, <span class="string">'same'</span>);
+
+<span class="comment">% In order to compute the Corner Response Function, we use the following</span>
+<span class="comment">% formula (define alpha 0.04):</span>
+alpha = 0.04;
+cornerResponseFunction = (smoothedA .* smoothedB - smoothedC.^2) - alpha * (smoothedA + smoothedB).^2;
+
+<span class="comment">% Next we need to create our isLocalMax function. The Corner Response</span>
+<span class="comment">% Function usually will have several 'corners' all that appear in the same</span>
+<span class="comment">% area. The function will help us determine which is the best corner for</span>
+<span class="comment">% our program to use. Use the following code for 'isLocalMax':</span>
+
+<span class="keyword">function</span> [myBool] = isLocalMax(harrisMatrix, u, v)
+    height = size(harrisMatrix, 1);
+    width = size(harrisMatrix, 2);
+
+    <span class="keyword">if</span> (u &lt;= 1 || u &gt;= height || v &lt;= 1 || v &gt;= width)
+        myBool = false;
+    <span class="keyword">else</span>
+        <span class="comment">% return the image as a 1D array</span>
+        pix = reshape(harrisMatrix, height*width, 1);
+        i0 = (v-1)*height+u;
+        i1 = v*height+u;
+        i2 = (v+1)*height+u;
+
+        cp = pix(i1);
+
+        myBool = (cp &gt; pix(i0-1) &amp;&amp; cp &gt; pix(i0) &amp;&amp; cp &gt; pix(i0+1) &amp;&amp; cp &gt; pix(i1-1) &amp;&amp; cp &gt; pix(i1+1) &amp;&amp; cp &gt; pix(i2-1) &amp;&amp; cp &gt; pix(i2) &amp;&amp; cp &gt; pix(i2+1));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% We use the below function to help us determine the best corners to use.</span>
+<span class="comment">% We do this by stepping through our Corner Reponse Function matrix and</span>
+<span class="comment">% check to see if it's value is greater than a certain threshold and it is</span>
+<span class="comment">% a local max (this is checked by calling the isLocalMax fucntion</span>
+
+<span class="comment">%Implement the pseudocode listed below to perform the above task:</span>
+<span class="comment">% For each u:</span>
+    <span class="comment">% For each v:</span>
+        <span class="comment">%if(cornerResponseFunction(u,v) &gt; threshold &amp;&amp; islocalMax(cornerResponseFuncton, u, v)</span>
+            <span class="comment">% increment totalCorners by 1.</span>
+            <span class="comment">% Add the corner to our list (each corner contains u,v,q)</span>
+            <span class="comment">% cornerList (totalCorners) .x = u;</span>
+            <span class="comment">% cornerList (totalCorners) .y = v;</span>
+            <span class="comment">% cornerList (totalCorners) .q = q;</span>
+
+<span class="comment">% Initialize totalCorners to zero</span>
+totalCorners = 0;
+threshold = 200000;
+
+<span class="comment">% Initalize cornerList as an empty struct array</span>
+cornerList = struct(<span class="string">'x'</span>, {}, <span class="string">'y'</span>, {}, <span class="string">'q'</span>, {});
+
+<span class="comment">% For each u:</span>
+<span class="keyword">for</span> u = 1:size(cornerResponseFunction, 1)
+    <span class="comment">% For each v:</span>
+    <span class="keyword">for</span> v = 1:size(cornerResponseFunction, 2)
+        <span class="keyword">if</span> cornerResponseFunction(u,v) &gt; threshold &amp;&amp; isLocalMax(cornerResponseFunction, u, v)
+            <span class="comment">% Increment totalCorners by 1</span>
+            totalCorners = totalCorners + 1;
+            <span class="comment">% Add the corner to our list (each corner contains u,v,q)</span>
+            cornerList(totalCorners).x = u;
+            cornerList(totalCorners).y = v;
+            cornerList(totalCorners).q = cornerResponseFunction(u,v);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Output the total number of corners that passsed the threshold and isLocalMax</span>
+fprintf(<span class="string">'Total number of corners: %d\n'</span>, totalCorners);
+
+<span class="comment">% Sort the corners by their respective q value in descending order</span>
+[~, sortIdx] = sort([cornerList.q], <span class="string">'descend'</span>);
+cornerList = cornerList(sortIdx);
+
+<span class="comment">% Create a new variable goodCorners and initialize it into an empty array</span>
+goodCorners = [];
+
+<span class="comment">% Our corner response function may return a lot of corners that can be</span>
+<span class="comment">% quite close to each other. What we'd like to do next is define a min</span>
+<span class="comment">% distance that we want these functions (corners) to be from each other.</span>
+<span class="comment">% We'll then want to step through each of the corners and remove the ones</span>
+<span class="comment">% that are too close to each other. We do this by starting with the</span>
+<span class="comment">% strongest corner that we found (the first one in the list because it's</span>
+<span class="comment">% sorted) and remove other corners that are within the min distance to this</span>
+<span class="comment">% point.</span>
+
+<span class="comment">% First thing we will want to do is initialize min distance</span>
+minDistance = 10;
+
+<span class="keyword">while</span>(size(cornerList,2) &gt; 0)
+    cl = cornerList(1);
+    <span class="comment">% remove the first one</span>
+    cornerList = cornerList (2:end);
+
+    goodCorners = [goodCorners cl];
+
+    cornersToRemove = [];
+    <span class="keyword">for</span> i=2:size(cornerList,2)
+        <span class="keyword">if</span> (sqrt((cl.x - cornerList(i).x)^2 + (cl.y - cornerList(i).y)^2) &lt; minDistance)
+            cornersToRemove = [cornersToRemove i];
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Remove the corners that we found are too close</span>
+    cornerList(cornersToRemove) = [];
+
+<span class="keyword">end</span>
+
+<span class="comment">% Step through the goodCorners list and mark each of the corners in the</span>
+<span class="comment">% image with a green 'cross' or x that is 3 pixels in width and height</span>
+<span class="comment">% Display the image to the user</span>
+figure;
+imshow(uint8(myImage));
+hold <span class="string">on</span>
+<span class="keyword">for</span> i = 1:length(goodCorners)
+    plot(goodCorners(i).y, goodCorners(i).x, <span class="string">'g+'</span>,<span class="string">'MarkerSize'</span>,3, <span class="string">'LineWidth'</span>,2);
+<span class="keyword">end</span>
+hold <span class="string">off</span>;
+</pre>
+<pre class="codeoutput">Total number of corners: 1121
+</pre>
+<img vspace="5" hspace="5" src="harrisCorner_01.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+% Read the image into Matlab and name it myImage
+myImage = imread("Penguins.jpg");
+
+% Convert the rgb image to grayscale
+myImage = rgb2gray(myImage);
+
+% Cast the variable to double and reassign it to itself
+myImage = double(myImage);
+
+% Create X and Y derivative filters
+dxFilter = [-1 0 -1; -1 0 1; -1 0 1];
+dyFilter = dxFilter';
+
+% Create an X derivative image and a Y derivative image by convolving
+% the appropriate filters with the grayscale image. Use the following
+% names for the new images: myImageDerivativeX and myImageDerivativeY
+myImageDerivativeX = conv2(myImage, dxFilter, 'same');
+myImageDerivativeY = conv2(myImage, dyFilter, 'same');
+
+% Now that we have the derivatives, we can calculate A, B, & C
+A = myImageDerivativeX .^2;
+B = myImageDerivativeY .^2;
+C = myImageDerivativeX .* myImageDerivativeY;
+
+% After you calculate the above you want to apply Gaussian smoothing (using
+% a Gausssian Filter) using the conv2 command. Store each of the smoothed
+% derivatives in smoothdA, smoothedB, & smoothedC. You can use the
+% following command to create your Gaussian filter:
+gaussianFilter = fspecial('gaussian');
+smoothedA = conv2(A, gaussianFilter, 'same');
+smoothedB = conv2(B, gaussianFilter, 'same');
+smoothedC = conv2(C, gaussianFilter, 'same');
+
+% In order to compute the Corner Response Function, we use the following
+% formula (define alpha 0.04):
+alpha = 0.04;
+cornerResponseFunction = (smoothedA .* smoothedB - smoothedC.^2) - alpha * (smoothedA + smoothedB).^2;
+
+% Next we need to create our isLocalMax function. The Corner Response
+% Function usually will have several 'corners' all that appear in the same
+% area. The function will help us determine which is the best corner for
+% our program to use. Use the following code for 'isLocalMax':
+
+function [myBool] = isLocalMax(harrisMatrix, u, v)
+    height = size(harrisMatrix, 1);
+    width = size(harrisMatrix, 2);
+
+    if (u <= 1 || u >= height || v <= 1 || v >= width)
+        myBool = false;
+    else
+        % return the image as a 1D array
+        pix = reshape(harrisMatrix, height*width, 1); 
+        i0 = (v-1)*height+u;
+        i1 = v*height+u;
+        i2 = (v+1)*height+u;
+
+        cp = pix(i1);
+
+        myBool = (cp > pix(i0-1) && cp > pix(i0) && cp > pix(i0+1) && cp > pix(i1-1) && cp > pix(i1+1) && cp > pix(i2-1) && cp > pix(i2) && cp > pix(i2+1));
+    end
+end
+
+% We use the below function to help us determine the best corners to use. 
+% We do this by stepping through our Corner Reponse Function matrix and
+% check to see if it's value is greater than a certain threshold and it is
+% a local max (this is checked by calling the isLocalMax fucntion
+
+%Implement the pseudocode listed below to perform the above task:
+% For each u:
+    % For each v: 
+        %if(cornerResponseFunction(u,v) > threshold && islocalMax(cornerResponseFuncton, u, v)
+            % increment totalCorners by 1.
+            % Add the corner to our list (each corner contains u,v,q)
+            % cornerList (totalCorners) .x = u;
+            % cornerList (totalCorners) .y = v;
+            % cornerList (totalCorners) .q = q;
+
+% Initialize totalCorners to zero
+totalCorners = 0;
+threshold = 200000;
+
+% Initalize cornerList as an empty struct array
+cornerList = struct('x', {}, 'y', {}, 'q', {});
+
+% For each u:
+for u = 1:size(cornerResponseFunction, 1)
+    % For each v:
+    for v = 1:size(cornerResponseFunction, 2)
+        if cornerResponseFunction(u,v) > threshold && isLocalMax(cornerResponseFunction, u, v)
+            % Increment totalCorners by 1
+            totalCorners = totalCorners + 1;
+            % Add the corner to our list (each corner contains u,v,q)
+            cornerList(totalCorners).x = u;
+            cornerList(totalCorners).y = v;
+            cornerList(totalCorners).q = cornerResponseFunction(u,v);
+        end
+    end
+end
+
+% Output the total number of corners that passsed the threshold and isLocalMax
+fprintf('Total number of corners: %d\n', totalCorners);
+
+% Sort the corners by their respective q value in descending order
+[~, sortIdx] = sort([cornerList.q], 'descend');
+cornerList = cornerList(sortIdx);
+
+% Create a new variable goodCorners and initialize it into an empty array
+goodCorners = [];
+
+% Our corner response function may return a lot of corners that can be
+% quite close to each other. What we'd like to do next is define a min
+% distance that we want these functions (corners) to be from each other.
+% We'll then want to step through each of the corners and remove the ones
+% that are too close to each other. We do this by starting with the
+% strongest corner that we found (the first one in the list because it's
+% sorted) and remove other corners that are within the min distance to this
+% point.
+
+% First thing we will want to do is initialize min distance
+minDistance = 10;
+
+while(size(cornerList,2) > 0)
+    cl = cornerList(1);
+    % remove the first one
+    cornerList = cornerList (2:end); 
+
+    goodCorners = [goodCorners cl];
+
+    cornersToRemove = [];
+    for i=2:size(cornerList,2)
+        if (sqrt((cl.x - cornerList(i).x)^2 + (cl.y - cornerList(i).y)^2) < minDistance)
+            cornersToRemove = [cornersToRemove i];
+        end
+    end 
+
+    % Remove the corners that we found are too close
+    cornerList(cornersToRemove) = [];
+
+end
+
+% Step through the goodCorners list and mark each of the corners in the
+% image with a green 'cross' or x that is 3 pixels in width and height
+% Display the image to the user
+figure;
+imshow(uint8(myImage));
+hold on
+for i = 1:length(goodCorners)
+    plot(goodCorners(i).y, goodCorners(i).x, 'g+','MarkerSize',3, 'LineWidth',2);
+end
+hold off;
+##### SOURCE END #####
+-->
+</body>
+</html>
